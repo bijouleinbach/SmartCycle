@@ -1,2 +1,2 @@
 # SmartCycle
-AI-powered recycling contamination detection and disposal guidance system
+AI-powered recycling contamination detection and disposal guidance system.
