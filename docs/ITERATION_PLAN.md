@@ -110,6 +110,53 @@ Goal: ship every deliverable about a week early to leave room for feedback.
 | 3 | Train SmartCycle model + both baselines; wire up rule engine end-to-end | Run own evaluation slice (confusion matrix, per-condition accuracy); **draft Assignments 2 & 3** | Everyone's data feeds the cross-person variability analysis |
 | 4 (buffer) | Incorporate any professor/TA feedback from earlier deliverables; write final report; rehearse final presentation | Polish own individual write-ups | This week only exists because you're front-loading — protect it, don't let Weeks 1–3 slip into it |
 
+## Task breakdown & dependencies
+
+**Assumed role split** (swap freely — this just balances the workload across pipeline stages):
+
+- **Tian** — recycling-rules research, rule engine, pipeline integration
+- **Aparajita** — data infrastructure, baselines, evaluation harness
+- **Bijou** — repo scaffold, AI model (features + training)
+
+Plus, **everyone, always, in parallel:** collect + label your own ≥150-image dataset, and write your own individual Assignment 1/2/3 sections — those don't block on anyone else's code.
+
+**Critical path:** schema → rules.py / data.py / model skeleton → trained model → eval harness + pipeline → individual runs. Nothing in Phase 2 can start until its Phase 1 dependency lands, so don't let a skeleton sit unfinished.
+
+### Phase 0 — start immediately, in parallel (no dependencies)
+
+| # | Owner | Task | Blocked by |
+| --- | --- | --- | --- |
+| 0.1 | Bijou | Repo scaffold: `data/`, `src/`, `assignments/`, `report/` folders + `requirements.txt` + label schema file (`src/labels.py`) | — |
+| 0.2 | Tian | Pick one real local recycling program (campus or city) and write down its actual rules per material/condition — this becomes `rules.py`'s source data | — |
+| 0.3 | Aparajita | Download TrashNet and/or TACO, inspect format/labels, note how they map onto our schema | — |
+| 0.4 | Everyone | Start photographing your own item set — don't wait on the schema to start shooting | — |
+
+### Phase 1 — once the schema exists (0.1 done)
+
+| # | Owner | Task | Blocked by |
+| --- | --- | --- | --- |
+| 1.1 | Everyone | Label your own photos against `src/labels.py` into `data/<name>/labeled/` + a CSV | 0.1 |
+| 1.2 | Tian | Write `src/rules.py`: material × condition × component → action, using the real rules from 0.2 | 0.1, 0.2 |
+| 1.3 | Aparajita | Write `src/data.py`: loads all three `data/<name>/labeled/` folders into one dataset, stratified train/val/test split, keeps a per-person holdout | 0.1 |
+| 1.4 | Bijou | Write `src/model.py` skeleton (transfer-learning classifier); prototype against TrashNet from 0.3 while real data is still coming in | 0.1, 0.3 |
+
+### Phase 2 — once Phase 1 skeletons + some real labeled data exist
+
+| # | Owner | Task | Blocked by |
+| --- | --- | --- | --- |
+| 2.1 | Bijou | Train first model checkpoint on pooled labeled data | 1.3, 1.1 (at least partial data) |
+| 2.2 | Aparajita | Write `src/eval.py`: confusion matrix + accuracy-by-condition/person, plus Baseline 1 & 2 implementations | 1.3, 2.1 (needs the model's output format) |
+| 2.3 | Tian | Write `src/pipeline.py`: wires capture → `model.py` → `rules.py` → decision, including the re-scan/verify loop | 1.2, 2.1 |
+
+### Phase 3 — integration + individual evaluation
+
+| # | Owner | Task | Blocked by |
+| --- | --- | --- | --- |
+| 3.1 | Everyone | Run `pipeline.py` against your own held-out labeled images; save your individual confusion matrix + accuracy numbers | 2.2, 2.3 |
+| 3.2 | Everyone | Write your individual Assignment 1 sensing section — only needs a few sample photos, not code | 0.4 |
+| 3.3 | Everyone | Write your individual Assignment 2/3 sections using your own plots/numbers from 3.1 | 3.1 |
+| 3.4 | Whole team | Assemble the group parts of Assignments 1–3 (proposal update, feature list, system diagram, AI method write-up) | corresponding phase's code done |
+
 ## Git workflow
 
 - `main` stays protected and buildable. Your branch (`bijou`) is already pushed — Tian and Aparajita should each create their own (`tian`, `aparajita`) off `main`.
