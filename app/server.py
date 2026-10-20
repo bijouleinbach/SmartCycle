@@ -198,17 +198,31 @@ def public_base(request: Request) -> str:
     host, port = request.url.hostname, request.url.port
     if host in ("localhost", "127.0.0.1", "::1"):
         host = lan_ip()  # a phone can't reach "localhost" on the laptop
-    return f"{request.url.scheme}://{host}" + (f":{port}" if port else "")
+    return f"{request.url.scheme}://{_bracket(host)}" + (f":{port}" if port else "")
 
 
 def lan_ip() -> str:
-    # Opening a UDP socket sends nothing; it just asks the OS which interface it would use.
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        try:
-            sock.connect(("8.8.8.8", 80))
+    """This computer's address on the local network, for phones to connect to."""
+    ipv4 = _route_addr(socket.AF_INET, "8.8.8.8")
+    # 192.0.0.x is a placeholder IPv4 address on IPv6-only networks (e.g. many
+    # phone hotspots); other devices can't reach it, so use the IPv6 address.
+    if ipv4 and not ipv4.startswith("192.0.0."):
+        return ipv4
+    return _route_addr(socket.AF_INET6, "2001:4860:4860::8888") or ipv4 or "127.0.0.1"
+
+
+def _route_addr(family, target):
+    # Connecting a UDP socket sends nothing; it just asks the OS which address it would use.
+    try:
+        with socket.socket(family, socket.SOCK_DGRAM) as sock:
+            sock.connect((target, 80))
             return sock.getsockname()[0]
-        except OSError:
-            return "127.0.0.1"
+    except OSError:
+        return None
+
+
+def _bracket(host: str) -> str:
+    return f"[{host}]" if ":" in host else host  # IPv6 addresses need brackets in URLs
 
 
 if __name__ == "__main__":
@@ -216,7 +230,16 @@ if __name__ == "__main__":
 
     port = int(os.environ.get("PORT", 8000))
     print(f"\n  SmartCycle is running. Open http://localhost:{port} on this computer.")
-    print(f"  Phones on the same Wi-Fi can use http://{lan_ip()}:{port}\n")
+    print(f"  Phones on the same Wi-Fi can use http://{_bracket(lan_ip())}:{port}\n")
     if predictor is None:
         print("  (No trained model yet: the app will ask for every label. Train with `python -m src.model`.)\n")
-    uvicorn.run(app, host="0.0.0.0", port=port, log_level="warning")
+    # Listen on IPv4 and IPv6 at once, so phones can connect on regular Wi-Fi and
+    # on IPv6-only phone hotspots.
+    try:
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+    except (OSError, AttributeError):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind(("::" if sock.family == socket.AF_INET6 else "0.0.0.0", port))
+    uvicorn.Server(uvicorn.Config(app, log_level="warning")).run(sockets=[sock])
