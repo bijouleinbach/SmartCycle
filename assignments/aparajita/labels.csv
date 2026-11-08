@@ -1,0 +1,14 @@
+file,item_id,material,condition,x0,y0,x1,y1,notes
+IMG_0538.jpg,matcha_cup,plastic,residue,0.18,0.03,0.72,0.86,matcha film at base; faint from the front
+IMG_0539.jpg,matcha_cup,plastic,residue,0.26,0.14,0.79,0.80,inverted view; matcha film clearly visible at base
+IMG_0626.jpg,raisin_jar,plastic,clean,0.18,0.15,0.86,0.86,empty jar with lid on
+IMG_0627.jpg,raisin_jar,plastic,clean,0.12,0.27,0.89,0.90,inverted view
+IMG_0628.jpg,glass_bottle,glass,clean,0.36,0.22,0.64,0.90,water droplets inside and out
+IMG_0629.jpg,glass_bottle,glass,clean,0.30,0.24,0.62,0.87,angled view; water droplets
+IMG_0630.jpg,cardboard_box,paper,clean,0.00,0.15,1.00,0.90,box with plastic film and tissue inside
+IMG_0640.jpg,dosa_tub,plastic,unknown,0.20,0.30,0.84,0.84,lid on; inside not visible - CHECK the physical tub
+IMG_0641.jpg,dosa_tub,plastic,unknown,0.12,0.23,0.86,0.82,top view of lid; inside not visible - CHECK the physical tub
+IMG_0642.jpg,cold_brew_bottle,plastic,unknown,0.27,0.17,0.79,0.87,cap on; inside not visible - CHECK the physical bottle
+IMG_0660.jpg,pasta_box,paper,unknown,0.30,0.12,0.88,0.89,top flap torn open; inside not visible - CHECK the physical box
+IMG_0661.jpg,milk_jug,plastic,unknown,0.25,0.14,0.73,0.96,opaque jug; inside not visible - CHECK the physical jug
+IMG_0662.jpg,cheese_bag,plastic,residue,0.13,0.21,0.84,0.87,flexible film bag; shredded cheese stuck inside is visible

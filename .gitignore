@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+assignments/aparajita/photos/
+assignments/aparajita/results/
+assignments/aparajita/labels_backup.csv
